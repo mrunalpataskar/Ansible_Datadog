@@ -34,11 +34,17 @@
 # because some tasks in pkg-windows.yml are carried out regardless of its value.
 - name: Windows Install Tasks
   include_tasks: pkg-windows.yml
+  register: datadog_installation_result  
   when: ansible_facts.os_family == "Windows"
 
 - name: Windows Configuration Tasks
   include_tasks: agent-win.yml
   when: agent_datadog_agent_major_version | int > 5 and ansible_facts.os_family == "Windows"
+
+- name: Register DataDog agent version
+  set_fact:
+    datadog_agent_installed_version: "{{ datadog_installation_result.stdout | default('') | regex_findall('Datadog Agent v([0-9]+\\.[0-9]+\\.[0-9]+)') | first }}"
+  when: datadog_installation_result is succeeded and datadog_installation_result.stdout is defined and datadog_installation_result.stdout is search('Datadog Agent v[0-9]+\\.[0-9]+\\.[0-9]+') 
 
 - name: Integrations Tasks
   include_tasks: integration.yml
@@ -51,3 +57,8 @@
 - name: Send telemetry
   include_tasks: telemetry.yml
   when: datadog_apm_instrumentation_enabled | length > 0
+
+- name: Print installed DataDog agent version
+  debug:
+    msg: "DataDog agent version installed: {{ datadog_agent_installed_version }}"
+  when: datadog_agent_installed_version is defined    
