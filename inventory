@@ -1,5 +1,5 @@
 [servers]
-172.31.85.100
+ip-172-31-80-203.ec2.internal
 
 [servers:vars]
 ansible_user=Administrator
