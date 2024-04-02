@@ -1,0 +1,5 @@
+---
+- name: Fail if OS is not supported
+  fail:
+    msg: "The Datadog Ansible script is not meant for your OS."
+  when: ansible_facts.os_family in ["Windows"]

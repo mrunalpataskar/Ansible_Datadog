@@ -1,0 +1,30 @@
+# Default windows latest msi package URL
+datadog_windows_download_url: ""
+
+# These variables specify the default URL to download the latest version of the Datadog agent for Windows.
+datadog_windows_agent6_latest_url: "https://s3.amazonaws.com/ddagent-windows-stable/datadog-agent-6-latest.amd64.msi"
+datadog_windows_agent7_latest_url: "https://s3.amazonaws.com/ddagent-windows-stable/datadog-agent-7-latest.amd64.msi"
+
+# If datadog_agent_version is set, the role will use this url prefix and append the version number to get the full msi package URL.
+datadog_windows_versioned_url: "https://s3.amazonaws.com/ddagent-windows-stable/ddagent-cli"
+
+# URL for the script to fix version 6.14 issues on Windows. More details: https://dtdg.co/win-614-fix
+datadog_windows_614_fix_script_url: "https://s3.amazonaws.com/ddagent-windows-stable/scripts/fix_6_14.ps1"
+# Whether or not to apply the fix for version 6.14 on Windows.
+datadog_apply_windows_614_fix: true
+
+# Override these to change the name and password of the Windows user created for Datadog.
+datadog_windows_ddagentuser_name: ""
+datadog_windows_ddagentuser_password: ""
+
+# Override to change the installation directory (default is C:\Program Files\Datadog\Datadog Agent).
+datadog_windows_program_files_dir: ""
+
+# Override to change the root of the configuration directory.
+datadog_windows_config_files_dir: ""
+
+# Default configuration root. Do not modify.
+datadog_windows_config_root: "{{ ansible_facts.env['ProgramData'] }}\\Datadog"
+
+# Default empty value for constructing the list of optional arguments to supply to the Windows installer.
+win_install_args: " "

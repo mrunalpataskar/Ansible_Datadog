@@ -1,0 +1,11 @@
+[servers]
+172.31.85.100
+
+[servers:vars]
+ansible_user=Administrator
+ansible_password="@@&*e@ql3?umKufuH%7FY*N4)DC@$SB("
+ansible_connection=winrm
+ansible_port=5986
+ansible_winrm_scheme=https
+ansible_winrm_kerberos_delegation=true
+ansible_winrm_server_cert_validation=ignore

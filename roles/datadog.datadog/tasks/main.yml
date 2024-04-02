@@ -1,0 +1,53 @@
+---
+- name: Include Gather Ansible Facts task on Ansible >= 2.10
+  include_tasks: facts-ansible10.yml
+  when: ansible_version.major >= 2 and ansible_version.minor >= 10
+
+- name: Include Gather Ansible Facts task on Ansible < 2.10
+  include_tasks: facts-ansible9.yml
+  when: ansible_version.major == 2 and ansible_version.minor < 10
+
+- name: Initialize internal datadog_config variable
+  set_fact:
+    agent_datadog_config: "{{ datadog_config }}"
+
+- name: Check if OS is supported
+  include_tasks: os-check.yml
+
+- name: Fail if API key is missing
+  fail:
+    msg: "datadog_api_key is mandatory when using managed config"
+  when: datadog_api_key is not defined and datadog_manage_config
+
+- name: Resolve datadog_tracked_checks later to defend against variable presidence issues arising from dynamically included null datadog_checks
+  include_tasks: sanitize-checks.yml
+
+# Also sets agent_datadog_skip_install
+- name: Set Facts for Datadog Agent Major Version
+  include_tasks: set-parse-version.yml
+
+- name: Check and resolve APM injection settings
+  include_tasks: apm-inject-check.yml
+  when: datadog_apm_instrumentation_enabled | length > 0
+
+# Note we don't check agent_datadog_skip_install variable value for windows here,
+# because some tasks in pkg-windows.yml are carried out regardless of its value.
+- name: Windows Install Tasks
+  include_tasks: pkg-windows.yml
+  when: ansible_facts.os_family == "Windows"
+
+- name: Windows Configuration Tasks
+  include_tasks: agent-win.yml
+  when: agent_datadog_agent_major_version | int > 5 and ansible_facts.os_family == "Windows"
+
+- name: Integrations Tasks
+  include_tasks: integration.yml
+  when: datadog_integration is defined
+
+- name: APM Host injection tasks
+  include_tasks: apm-inject-install.yml
+  when: datadog_apm_instrumentation_enabled | length > 0
+
+- name: Send telemetry
+  include_tasks: telemetry.yml
+  when: datadog_apm_instrumentation_enabled | length > 0
