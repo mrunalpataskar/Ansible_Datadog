@@ -2,8 +2,8 @@
 ec2-54-91-89-159.compute-1.amazonaws.com
 
 [servers:vars]
-ansible_user=Administrator
-ansible_password="@@&*e@ql3?umKufuH%7FY*N4)DC@$SB("
+ansible_user=
+ansible_password=""
 ansible_connection=winrm
 ansible_port=5986
 ansible_winrm_scheme=https
