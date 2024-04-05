@@ -1,4 +1,16 @@
 ---
+- name: Execute Python script to get Datadog agent version
+  command: python3 /home/ubuntu/Ansible_Datadog/python.py
+  register: script_output
+  changed_when: false
+  ignore_errors: yes  
+
+- name: Set datadog_agent_version from script output
+  set_fact:
+    datadog_agent_version: "{{ script_output.stdout }}"
+    when: script_output is succeeded
+    ignore_errors: yes  
+
 - name: Convert datadog_agent_major_version to string
   set_fact:
     agent_datadog_agent_major_version: "{{ datadog_agent_major_version | default('', true) | string }}"
@@ -7,11 +19,12 @@
   set_fact:
     agent_datadog_skip_install: false
 
-- name: Include parse version tasks
+- name: Include parse version tasks for prod servers
   include_tasks: parse-version.yml
-  when: datadog_agent_version | default('', true) | length > 0
+  when: datadog_agent_version | default('', true) | length > 0 and inventory_hostname in groups['servers']
 
-- name: Set Agent default major version
-  set_fact:
-    agent_datadog_agent_major_version: "7"
-  when: agent_datadog_agent_major_version | length == 0
+# Use this snippet for downloading the latest version in prod for later use
+#- name: Set Agent default major version for non-prod servers
+# set_fact:
+#  agent_datadog_agent_major_version: "7"
+# when: agent_datadog_agent_major_version | length == 0 and inventory_hostname in groups['non_prod']
